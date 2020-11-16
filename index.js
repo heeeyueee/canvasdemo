@@ -6,6 +6,8 @@ let ctx = canvas.getContext("2d");
 let paintFlag = false;
 ctx.translate(0.5, 0.5);
 ctx.strokeStyle = 'none';
+ctx.lineWidth = 6;
+ctx.lineCap = "round"
 //1.开始画点
 // canvas.onmousemove = (e) => {
 //     //画矩形
@@ -35,27 +37,61 @@ ctx.strokeStyle = 'none';
 // }
 //3.在手机上运行——手机画板
 //先判断是不是触屏设备
+// let isTouchDevice = "ontouchstart" in document.documentElement;
+// console.log(isTouchDevice);
+// if (isTouchDevice === true) {
+//     canvas.addEventListener('touchmove', function (e) {
+//         ctx.beginPath();
+//         ctx.arc(e.changedTouches[0].clientX, e.changedTouches[0].clientY, 10, 0, 2 * Math.PI);
+//         ctx.fillStyle = "black";
+//         ctx.stroke();
+//         ctx.fill();
+//     })
+// } else {
+//     canvas.onmousedown = () => {
+//         paintFlag = true;
+//     }
+//     canvas.onmousemove = (e) => {
+//         if (paintFlag === true) {
+//             ctx.beginPath();
+//             ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI);
+//             ctx.fillStyle = "black";
+//             ctx.stroke();
+//             ctx.fill();
+//         }
+//     }
+//     canvas.onmouseup = () => {
+//         paintFlag = false;
+//     }
+// }
+//4.canvas画线
+function drawLine(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+}
+//记录划线的起点
+let last;
 let isTouchDevice = "ontouchstart" in document.documentElement;
 console.log(isTouchDevice);
 if (isTouchDevice === true) {
+    canvas.addEventListener('touchstart', function (e) {
+        last = [e.changedTouches[0].clientX, e.changedTouches[0].clientY];
+    })
     canvas.addEventListener('touchmove', function (e) {
-        ctx.beginPath();
-        ctx.arc(e.changedTouches[0].clientX, e.changedTouches[0].clientY, 10, 0, 2 * Math.PI);
-        ctx.fillStyle = "black";
-        ctx.stroke();
-        ctx.fill();
+        drawLine(last[0], last[1], e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        last = [e.changedTouches[0].clientX, e.changedTouches[0].clientY];
     })
 } else {
-    canvas.onmousedown = () => {
+    canvas.onmousedown = (e) => {
         paintFlag = true;
+        last = [e.clientX, e.clientY];
     }
     canvas.onmousemove = (e) => {
         if (paintFlag === true) {
-            ctx.beginPath();
-            ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI);
-            ctx.fillStyle = "black";
-            ctx.stroke();
-            ctx.fill();
+            drawLine(last[0], last[1], e.clientX, e.clientY);
+            last = [e.clientX, e.clientY];
         }
     }
     canvas.onmouseup = () => {
